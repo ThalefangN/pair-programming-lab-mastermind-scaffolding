@@ -1,4 +1,7 @@
 // https://jsdoc.app
+
+// Tlhalefang Ntshilane &&  Topo Morolong
+
 /**
  * @function checkGuess
  * Checks guess for "mastermind" game against solution
@@ -32,6 +35,38 @@ function checkGuess(guess, solution) {
   // characters not in the right place"
   // for example, "2-1"
   //
+  let correctPosition = 0;
+  let correctNumberWrongPosition = 0;
+
+  const guessArr = guess.split('');
+  const solutionArr = solution.split('');
+
+  const guessUsed = Array(guess.length).fill(false);
+  const solutionUsed = Array(solution.length).fill(false);
+
+  // Count correct positions with a loop
+  for (let i = 0; i < guessArr.length; i++) {
+    if (guessArr[i] === solutionArr[i]) {
+      correctPosition++;
+      guessUsed[i] = true;
+      solutionUsed[i] = true;
+    }
+  }
+  // Count correct numbers in wrong positions
+  for (let i = 0; i < guessArr.length; i++) {
+    if (!guessUsed[i]) {
+
+      for (let j = 0; j < solutionArr.length; j++) {
+        if (!solutionUsed[j] && guessArr[i] === solutionArr[j]) {
+          correctNumberWrongPosition++;
+          solutionUsed[j] = true; // Mark this solution character as used
+          break; // Break to avoid counting the same character again
+        }
+      }
+    }
+  }
+  return `${correctPosition}-${correctNumberWrongPosition}`;
+
 }
 
 // https://jsdoc.app
