@@ -1,110 +1,80 @@
+// Tlhalefang Ntshilane && Topo Morolong
 // https://jsdoc.app
-
-// Tlhalefang Ntshilane &&  Topo Morolong
 
 /**
  * @function checkGuess
- * Checks guess for "mastermind" game against solution
+ * Compares a guess against the solution in the "mastermind" game.
  *
- * @param {string} guess - the solution to the
- * @param {string} solution - the target for the guess
- *
- * @returns {string} - an string representing the number of correct numbers
- *                     in the correct position and the number of correct
- *                     numbers in the incorrect position for the guess
+ * @param {string} guess - The guessed string.
+ * @param {string} solution - The correct solution string.
+ * @returns {string} A string in the format "x-y", where:
+ *   - x = number of correct digits in the correct position
+ *   - y = number of correct digits in the wrong position
  *
  * @example
- * checkGuess('1532, '1234')
- * // returns '2-1'
- * // two numbers in the correct place (1 and 3)
- * // and one correct number in the incorrect place (2)
- *
+ * checkGuess('1532', '1234') // returns '2-1'
  */
 function checkGuess(guess, solution) {
-  // TODO: complete this function
-  // first determine how many characters total the two strings have in common
-  // This may help:
-  // https://github.com/bonnie/udemy-ENZYME/blob/master/context-base/src/helpers/index.js
-  //
-  // then determine how many of those characters are in the right place
-  // hint: iterate through characters of guess and compare to character
-  // in the same position in solution
-  //
-  // finally, return a string in the format
-  // "count of correct characters in the right place"-"count of correct
-  // characters not in the right place"
-  // for example, "2-1"
-  //
-  let correctPosition = 0;
-  let correctNumberWrongPosition = 0;
+  let exactMatches = 0;
+  let partialMatches = 0;
 
   const guessArr = guess.split('');
   const solutionArr = solution.split('');
-
   const guessUsed = Array(guess.length).fill(false);
   const solutionUsed = Array(solution.length).fill(false);
 
-  // Count correct positions with a loop
+  // Step 1: Count exact matches
   for (let i = 0; i < guessArr.length; i++) {
     if (guessArr[i] === solutionArr[i]) {
-      correctPosition++;
+      exactMatches++;
       guessUsed[i] = true;
       solutionUsed[i] = true;
     }
   }
-  // Count correct numbers in wrong positions
-  for (let i = 0; i < guessArr.length; i++) {
-    if (!guessUsed[i]) {
 
-      for (let j = 0; j < solutionArr.length; j++) {
-        if (!solutionUsed[j] && guessArr[i] === solutionArr[j]) {
-          correctNumberWrongPosition++;
-          solutionUsed[j] = true; // Mark this solution character as used
-          break; // Break to avoid counting the same character again
-        }
+  // Step 2: Count partial matches
+  for (let i = 0; i < guessArr.length; i++) {
+    if (guessUsed[i]) continue;
+
+    for (let j = 0; j < solutionArr.length; j++) {
+      if (!solutionUsed[j] && guessArr[i] === solutionArr[j]) {
+        partialMatches++;
+        solutionUsed[j] = true;
+        break;
       }
     }
   }
-  return `${correctPosition}-${correctNumberWrongPosition}`;
 
+  return `${exactMatches}-${partialMatches}`;
 }
 
-// https://jsdoc.app
 /**
  * @function processInput
- * Checks guesses for "mastermind" game against solution
+ * Processes multiple guesses against a solution in the "mastermind" game.
  *
- * @param {string} solution - the target for the guesses
- * @param {string[]} guesses - an array of strings representing guesses
- *
- * @returns {string[]} - an array of strings representing the number of
- *                       correct numbers in the correct position and the number
- *                       of correct numbers in the incorrect position for each
- *                       guess
+ * @param {string} solution - The correct solution string.
+ * @param {string[]} guesses - Array of guess strings.
+ * @returns {string[]} An array of result strings for each guess.
  *
  * @example
- * // returns ['2-1', '0-1']
- * processInput('1234', ['1532', '8793'])
- *
+ * processInput('1234', ['1532', '8793']) // returns ['2-1', '0-1']
  */
 function processInput(solution, guesses) {
-  return guesses.map((guess) => checkGuess(guess, solution));
+  return guesses.map(guess => checkGuess(guess, solution));
 }
 
-// ----------- main program ------- //
-// process arguments via destructuring
-//
+// -------- Main Program -------- //
+
 const [solution, guessCount, ...guesses] = process.argv.slice(2);
 
-// (lightly) verify the input
+// Input validation
 if (guesses.length !== Number(guessCount)) {
   console.warn(
-    `The number of guesses provided (${guesses.length}) does not match the guess count (${guessCount}).`
+    `Error: Expected ${guessCount} guesses but received ${guesses.length}.`
   );
-  console.warn("Exiting.");
-  process.exit(-1);
+  process.exit(1);
 }
 
-// pass the input to the processor and print the output
-const output = processInput(solution, guesses);
-console.log(output.join(" "));
+// Compute and display the results
+const results = processInput(solution, guesses);
+console.log(results.join(' '));
